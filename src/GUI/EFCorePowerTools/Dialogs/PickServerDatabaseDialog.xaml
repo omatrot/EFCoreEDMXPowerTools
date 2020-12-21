@@ -3,6 +3,7 @@
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                 xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
                  Title="Choose Database Connection" 
                  WindowStyle="SingleBorderWindow"
                  WindowStartupLocation="CenterOwner"
@@ -69,14 +70,26 @@
                       ItemsSource="{Binding DatabaseConnections, Mode=OneWay}"
                       SelectedItem="{Binding SelectedDatabaseConnection, Mode=TwoWay}"
                       DisplayMemberPath="ConnectionName"/>
-            <dw:DialogButton Grid.Column="1"
+            <xctk:SplitButton Grid.Column="1"
+                              Width="72"
+                              Margin="12,12,0,12"
+                              Content="Add..."
+                              TabIndex="2"
+                              Command="{Binding AddDatabaseConnectionCommand}"
+                              >
+                <xctk:SplitButton.DropDownContent>
+                    <dw:DialogButton Grid.Column="1"
                              TabIndex="2"
                              Style="{StaticResource SourceSelectionButtonStyle}"
-                             Content="Add..."
-                             Command="{Binding AddDatabaseConnectionCommand}"/>
+                             Content="Add manual..."
+                             Click="DialogButton_Click"
+                            />
+                </xctk:SplitButton.DropDownContent>
+            </xctk:SplitButton>
+            
         </Grid>
 
-        <TextBlock Grid.Row="1" Margin="10,0,0,0"
+        <TextBlock Grid.Row="1" Margin="10,0,112.667,0"
                    Text="Choose SQL Server Database project (.dacpac)"/>
 
         <Grid Grid.Row="2"

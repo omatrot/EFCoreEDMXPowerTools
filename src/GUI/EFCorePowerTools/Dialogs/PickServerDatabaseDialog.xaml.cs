@@ -82,5 +82,11 @@
         {
             _addSchemas(schemas);
         }
+
+        private void DialogButton_Click(object sender, RoutedEventArgs e)
+        {
+            var connectionDialog = new ConnectionDialog();
+            connectionDialog.ShowModal();
+        }
     }
 }
