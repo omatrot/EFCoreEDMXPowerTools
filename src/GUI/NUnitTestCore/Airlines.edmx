@@ -1,0 +1,634 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="demoModel.Store" Provider="Npgsql" ProviderManifestToken="11.11" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6005: The data type 'jsonb' is currently not supported for the target Entity Framework version; the column 'model' in the table 'demo.bookings.aircrafts_data' was excluded.-->
+        <EntityType Name="aircrafts_data">
+          <Key>
+            <PropertyRef Name="aircraft_code" />
+          </Key>
+          <Property Name="aircraft_code" Type="bpchar" MaxLength="3" Nullable="false" />
+          <Property Name="range" Type="int4" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6005: The data type 'jsonb' is currently not supported for the target Entity Framework version; the column 'airport_name' in the table 'demo.bookings.airports_data' was excluded.
+warning 6005: The data type 'jsonb' is currently not supported for the target Entity Framework version; the column 'city' in the table 'demo.bookings.airports_data' was excluded.
+warning 6005: The data type 'point' is currently not supported for the target Entity Framework version; the column 'coordinates' in the table 'demo.bookings.airports_data' was excluded.-->
+        <EntityType Name="airports_data">
+          <Key>
+            <PropertyRef Name="airport_code" />
+          </Key>
+          <Property Name="airport_code" Type="bpchar" MaxLength="3" Nullable="false" />
+          <Property Name="timezone" Type="text" Nullable="false" />
+        </EntityType>
+        <EntityType Name="boarding_passes">
+          <Key>
+            <PropertyRef Name="ticket_no" />
+            <PropertyRef Name="flight_id" />
+          </Key>
+          <Property Name="ticket_no" Type="bpchar" MaxLength="13" Nullable="false" />
+          <Property Name="flight_id" Type="int4" Nullable="false" />
+          <Property Name="boarding_no" Type="int4" Nullable="false" />
+          <Property Name="seat_no" Type="varchar" MaxLength="4" Nullable="false" />
+        </EntityType>
+        <EntityType Name="bookings">
+          <Key>
+            <PropertyRef Name="book_ref" />
+          </Key>
+          <Property Name="book_ref" Type="bpchar" MaxLength="6" Nullable="false" />
+          <Property Name="book_date" Type="timestamptz" Precision="7" Nullable="false" />
+          <Property Name="total_amount" Type="numeric" Precision="10" Scale="2" Nullable="false" />
+        </EntityType>
+        <EntityType Name="flights">
+          <Key>
+            <PropertyRef Name="flight_id" />
+          </Key>
+          <Property Name="flight_id" Type="int4" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="flight_no" Type="bpchar" MaxLength="6" Nullable="false" />
+          <Property Name="scheduled_departure" Type="timestamptz" Precision="7" Nullable="false" />
+          <Property Name="scheduled_arrival" Type="timestamptz" Precision="7" Nullable="false" />
+          <Property Name="departure_airport" Type="bpchar" MaxLength="3" Nullable="false" />
+          <Property Name="arrival_airport" Type="bpchar" MaxLength="3" Nullable="false" />
+          <Property Name="status" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="aircraft_code" Type="bpchar" MaxLength="3" Nullable="false" />
+          <Property Name="actual_departure" Type="timestamptz" Precision="7" />
+          <Property Name="actual_arrival" Type="timestamptz" Precision="7" />
+        </EntityType>
+        <EntityType Name="seats">
+          <Key>
+            <PropertyRef Name="aircraft_code" />
+            <PropertyRef Name="seat_no" />
+          </Key>
+          <Property Name="aircraft_code" Type="bpchar" MaxLength="3" Nullable="false" />
+          <Property Name="seat_no" Type="varchar" MaxLength="4" Nullable="false" />
+          <Property Name="fare_conditions" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ticket_flights">
+          <Key>
+            <PropertyRef Name="ticket_no" />
+            <PropertyRef Name="flight_id" />
+          </Key>
+          <Property Name="ticket_no" Type="bpchar" MaxLength="13" Nullable="false" />
+          <Property Name="flight_id" Type="int4" Nullable="false" />
+          <Property Name="fare_conditions" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="amount" Type="numeric" Precision="10" Scale="2" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6005: The data type 'jsonb' is currently not supported for the target Entity Framework version; the column 'contact_data' in the table 'demo.bookings.tickets' was excluded.-->
+        <EntityType Name="tickets">
+          <Key>
+            <PropertyRef Name="ticket_no" />
+          </Key>
+          <Property Name="ticket_no" Type="bpchar" MaxLength="13" Nullable="false" />
+          <Property Name="book_ref" Type="bpchar" MaxLength="6" Nullable="false" />
+          <Property Name="passenger_id" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="passenger_name" Type="text" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'demo.bookings.aircrafts' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="aircrafts">
+          <Property Name="aircraft_code" Type="bpchar" MaxLength="3" />
+          <Property Name="model" Type="text" />
+          <Property Name="range" Type="int4" />
+        </EntityType>-->
+        <!--Errors Found During Generation:
+warning 6005: The data type 'point' is currently not supported for the target Entity Framework version; the column 'coordinates' in the table 'demo.bookings.airports' was excluded.
+warning 6013: The table/view 'demo.bookings.airports' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="airports">
+          <Property Name="airport_code" Type="bpchar" MaxLength="3" />
+          <Property Name="airport_name" Type="text" />
+          <Property Name="city" Type="text" />
+          <Property Name="timezone" Type="text" />
+        </EntityType>-->
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'demo.bookings.flights_v' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="flights_v">
+          <Property Name="flight_id" Type="int4" />
+          <Property Name="flight_no" Type="bpchar" MaxLength="6" />
+          <Property Name="scheduled_departure" Type="timestamptz" Precision="7" />
+          <Property Name="scheduled_departure_local" Type="timestamp" />
+          <Property Name="scheduled_arrival" Type="timestamptz" Precision="7" />
+          <Property Name="scheduled_arrival_local" Type="timestamp" />
+          <Property Name="scheduled_duration" Type="interval" Precision="6" />
+          <Property Name="departure_airport" Type="bpchar" MaxLength="3" />
+          <Property Name="departure_airport_name" Type="text" />
+          <Property Name="departure_city" Type="text" />
+          <Property Name="arrival_airport" Type="bpchar" MaxLength="3" />
+          <Property Name="arrival_airport_name" Type="text" />
+          <Property Name="arrival_city" Type="text" />
+          <Property Name="status" Type="varchar" MaxLength="20" />
+          <Property Name="aircraft_code" Type="bpchar" MaxLength="3" />
+          <Property Name="actual_departure" Type="timestamptz" Precision="7" />
+          <Property Name="actual_departure_local" Type="timestamp" />
+          <Property Name="actual_arrival" Type="timestamptz" Precision="7" />
+          <Property Name="actual_arrival_local" Type="timestamp" />
+          <Property Name="actual_duration" Type="interval" Precision="6" />
+        </EntityType>-->
+        <!--Errors Found During Generation:
+warning 6005: The data type '_int4' is currently not supported for the target Entity Framework version; the column 'days_of_week' in the table 'demo.bookings.routes' was excluded.
+warning 6013: The table/view 'demo.bookings.routes' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="routes">
+          <Property Name="flight_no" Type="bpchar" MaxLength="6" />
+          <Property Name="departure_airport" Type="bpchar" MaxLength="3" />
+          <Property Name="departure_airport_name" Type="text" />
+          <Property Name="departure_city" Type="text" />
+          <Property Name="arrival_airport" Type="bpchar" MaxLength="3" />
+          <Property Name="arrival_airport_name" Type="text" />
+          <Property Name="arrival_city" Type="text" />
+          <Property Name="aircraft_code" Type="bpchar" MaxLength="3" />
+          <Property Name="duration" Type="interval" Precision="6" />
+        </EntityType>-->
+        <Association Name="boarding_passes_ticket_no_fkey">
+          <End Role="ticket_flights" Type="Self.ticket_flights" Multiplicity="1" />
+          <End Role="boarding_passes" Type="Self.boarding_passes" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ticket_flights">
+              <PropertyRef Name="ticket_no" />
+              <PropertyRef Name="flight_id" />
+            </Principal>
+            <Dependent Role="boarding_passes">
+              <PropertyRef Name="ticket_no" />
+              <PropertyRef Name="flight_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="flights_aircraft_code_fkey">
+          <End Role="aircrafts_data" Type="Self.aircrafts_data" Multiplicity="1" />
+          <End Role="flights" Type="Self.flights" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="aircrafts_data">
+              <PropertyRef Name="aircraft_code" />
+            </Principal>
+            <Dependent Role="flights">
+              <PropertyRef Name="aircraft_code" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="flights_arrival_airport_fkey">
+          <End Role="airports_data" Type="Self.airports_data" Multiplicity="1" />
+          <End Role="flights" Type="Self.flights" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="airports_data">
+              <PropertyRef Name="airport_code" />
+            </Principal>
+            <Dependent Role="flights">
+              <PropertyRef Name="arrival_airport" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="flights_departure_airport_fkey">
+          <End Role="airports_data" Type="Self.airports_data" Multiplicity="1" />
+          <End Role="flights" Type="Self.flights" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="airports_data">
+              <PropertyRef Name="airport_code" />
+            </Principal>
+            <Dependent Role="flights">
+              <PropertyRef Name="departure_airport" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="seats_aircraft_code_fkey">
+          <End Role="aircrafts_data" Type="Self.aircrafts_data" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="seats" Type="Self.seats" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="aircrafts_data">
+              <PropertyRef Name="aircraft_code" />
+            </Principal>
+            <Dependent Role="seats">
+              <PropertyRef Name="aircraft_code" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ticket_flights_flight_id_fkey">
+          <End Role="flights" Type="Self.flights" Multiplicity="1" />
+          <End Role="ticket_flights" Type="Self.ticket_flights" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flights">
+              <PropertyRef Name="flight_id" />
+            </Principal>
+            <Dependent Role="ticket_flights">
+              <PropertyRef Name="flight_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ticket_flights_ticket_no_fkey">
+          <End Role="tickets" Type="Self.tickets" Multiplicity="1" />
+          <End Role="ticket_flights" Type="Self.ticket_flights" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tickets">
+              <PropertyRef Name="ticket_no" />
+            </Principal>
+            <Dependent Role="ticket_flights">
+              <PropertyRef Name="ticket_no" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="tickets_book_ref_fkey">
+          <End Role="bookings" Type="Self.bookings" Multiplicity="1" />
+          <End Role="tickets" Type="Self.tickets" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="bookings">
+              <PropertyRef Name="book_ref" />
+            </Principal>
+            <Dependent Role="tickets">
+              <PropertyRef Name="book_ref" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="demoModelStoreContainer">
+          <EntitySet Name="aircrafts_data" EntityType="Self.aircrafts_data" Schema="bookings" store:Type="Tables" />
+          <EntitySet Name="airports_data" EntityType="Self.airports_data" Schema="bookings" store:Type="Tables" />
+          <EntitySet Name="boarding_passes" EntityType="Self.boarding_passes" Schema="bookings" store:Type="Tables" />
+          <EntitySet Name="bookings" EntityType="Self.bookings" Schema="bookings" store:Type="Tables" />
+          <EntitySet Name="flights" EntityType="Self.flights" Schema="bookings" store:Type="Tables" />
+          <EntitySet Name="seats" EntityType="Self.seats" Schema="bookings" store:Type="Tables" />
+          <EntitySet Name="ticket_flights" EntityType="Self.ticket_flights" Schema="bookings" store:Type="Tables" />
+          <EntitySet Name="tickets" EntityType="Self.tickets" Schema="bookings" store:Type="Tables" />
+          <AssociationSet Name="boarding_passes_ticket_no_fkey" Association="Self.boarding_passes_ticket_no_fkey">
+            <End Role="ticket_flights" EntitySet="ticket_flights" />
+            <End Role="boarding_passes" EntitySet="boarding_passes" />
+          </AssociationSet>
+          <AssociationSet Name="flights_aircraft_code_fkey" Association="Self.flights_aircraft_code_fkey">
+            <End Role="aircrafts_data" EntitySet="aircrafts_data" />
+            <End Role="flights" EntitySet="flights" />
+          </AssociationSet>
+          <AssociationSet Name="flights_arrival_airport_fkey" Association="Self.flights_arrival_airport_fkey">
+            <End Role="airports_data" EntitySet="airports_data" />
+            <End Role="flights" EntitySet="flights" />
+          </AssociationSet>
+          <AssociationSet Name="flights_departure_airport_fkey" Association="Self.flights_departure_airport_fkey">
+            <End Role="airports_data" EntitySet="airports_data" />
+            <End Role="flights" EntitySet="flights" />
+          </AssociationSet>
+          <AssociationSet Name="seats_aircraft_code_fkey" Association="Self.seats_aircraft_code_fkey">
+            <End Role="aircrafts_data" EntitySet="aircrafts_data" />
+            <End Role="seats" EntitySet="seats" />
+          </AssociationSet>
+          <AssociationSet Name="ticket_flights_flight_id_fkey" Association="Self.ticket_flights_flight_id_fkey">
+            <End Role="flights" EntitySet="flights" />
+            <End Role="ticket_flights" EntitySet="ticket_flights" />
+          </AssociationSet>
+          <AssociationSet Name="ticket_flights_ticket_no_fkey" Association="Self.ticket_flights_ticket_no_fkey">
+            <End Role="tickets" EntitySet="tickets" />
+            <End Role="ticket_flights" EntitySet="ticket_flights" />
+          </AssociationSet>
+          <AssociationSet Name="tickets_book_ref_fkey" Association="Self.tickets_book_ref_fkey">
+            <End Role="bookings" EntitySet="bookings" />
+            <End Role="tickets" EntitySet="tickets" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="demoModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="aircrafts_data">
+          <Key>
+            <PropertyRef Name="aircraft_code" />
+          </Key>
+          <Property Name="aircraft_code" Type="String" MaxLength="3" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="range" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="flights" Relationship="Self.flights_aircraft_code_fkey" FromRole="aircrafts_data" ToRole="flights" />
+          <NavigationProperty Name="seats" Relationship="Self.seats_aircraft_code_fkey" FromRole="aircrafts_data" ToRole="seats" />
+        </EntityType>
+        <EntityType Name="airports_data">
+          <Key>
+            <PropertyRef Name="airport_code" />
+          </Key>
+          <Property Name="airport_code" Type="String" MaxLength="3" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="timezone" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="flights" Relationship="Self.flights_arrival_airport_fkey" FromRole="airports_data" ToRole="flights" />
+          <NavigationProperty Name="flights1" Relationship="Self.flights_departure_airport_fkey" FromRole="airports_data" ToRole="flights" />
+        </EntityType>
+        <EntityType Name="boarding_passes">
+          <Key>
+            <PropertyRef Name="ticket_no" />
+            <PropertyRef Name="flight_id" />
+          </Key>
+          <Property Name="ticket_no" Type="String" MaxLength="13" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="flight_id" Type="Int32" Nullable="false" />
+          <Property Name="boarding_no" Type="Int32" Nullable="false" />
+          <Property Name="seat_no" Type="String" MaxLength="4" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="ticket_flights" Relationship="Self.boarding_passes_ticket_no_fkey" FromRole="boarding_passes" ToRole="ticket_flights" />
+        </EntityType>
+        <EntityType Name="booking">
+          <Key>
+            <PropertyRef Name="book_ref" />
+          </Key>
+          <Property Name="book_ref" Type="String" MaxLength="6" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="book_date" Type="DateTimeOffset" Precision="7" Nullable="false" />
+          <Property Name="total_amount" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
+          <NavigationProperty Name="tickets" Relationship="Self.tickets_book_ref_fkey" FromRole="bookings" ToRole="tickets" />
+        </EntityType>
+        <EntityType Name="flight">
+          <Key>
+            <PropertyRef Name="flight_id" />
+          </Key>
+          <Property Name="flight_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="flight_no" Type="String" MaxLength="6" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="scheduled_departure" Type="DateTimeOffset" Precision="7" Nullable="false" />
+          <Property Name="scheduled_arrival" Type="DateTimeOffset" Precision="7" Nullable="false" />
+          <Property Name="departure_airport" Type="String" MaxLength="3" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="arrival_airport" Type="String" MaxLength="3" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="aircraft_code" Type="String" MaxLength="3" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="actual_departure" Type="DateTimeOffset" Precision="7" />
+          <Property Name="actual_arrival" Type="DateTimeOffset" Precision="7" />
+          <NavigationProperty Name="aircrafts_data" Relationship="Self.flights_aircraft_code_fkey" FromRole="flights" ToRole="aircrafts_data" />
+          <NavigationProperty Name="airports_data" Relationship="Self.flights_arrival_airport_fkey" FromRole="flights" ToRole="airports_data" />
+          <NavigationProperty Name="airports_data1" Relationship="Self.flights_departure_airport_fkey" FromRole="flights" ToRole="airports_data" />
+          <NavigationProperty Name="ticket_flights" Relationship="Self.ticket_flights_flight_id_fkey" FromRole="flights" ToRole="ticket_flights" />
+        </EntityType>
+        <EntityType Name="seat">
+          <Key>
+            <PropertyRef Name="aircraft_code" />
+            <PropertyRef Name="seat_no" />
+          </Key>
+          <Property Name="aircraft_code" Type="String" MaxLength="3" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="seat_no" Type="String" MaxLength="4" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="fare_conditions" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="aircrafts_data" Relationship="Self.seats_aircraft_code_fkey" FromRole="seats" ToRole="aircrafts_data" />
+        </EntityType>
+        <EntityType Name="ticket_flights">
+          <Key>
+            <PropertyRef Name="ticket_no" />
+            <PropertyRef Name="flight_id" />
+          </Key>
+          <Property Name="ticket_no" Type="String" MaxLength="13" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="flight_id" Type="Int32" Nullable="false" />
+          <Property Name="fare_conditions" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="amount" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
+          <NavigationProperty Name="boarding_passes" Relationship="Self.boarding_passes_ticket_no_fkey" FromRole="ticket_flights" ToRole="boarding_passes" />
+          <NavigationProperty Name="flight" Relationship="Self.ticket_flights_flight_id_fkey" FromRole="ticket_flights" ToRole="flights" />
+          <NavigationProperty Name="ticket" Relationship="Self.ticket_flights_ticket_no_fkey" FromRole="ticket_flights" ToRole="tickets" />
+        </EntityType>
+        <EntityType Name="ticket">
+          <Key>
+            <PropertyRef Name="ticket_no" />
+          </Key>
+          <Property Name="ticket_no" Type="String" MaxLength="13" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="book_ref" Type="String" MaxLength="6" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="passenger_id" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="passenger_name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="booking" Relationship="Self.tickets_book_ref_fkey" FromRole="tickets" ToRole="bookings" />
+          <NavigationProperty Name="ticket_flights" Relationship="Self.ticket_flights_ticket_no_fkey" FromRole="tickets" ToRole="ticket_flights" />
+        </EntityType>
+        <Association Name="flights_aircraft_code_fkey">
+          <End Role="aircrafts_data" Type="Self.aircrafts_data" Multiplicity="1" />
+          <End Role="flights" Type="Self.flight" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="aircrafts_data">
+              <PropertyRef Name="aircraft_code" />
+            </Principal>
+            <Dependent Role="flights">
+              <PropertyRef Name="aircraft_code" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="seats_aircraft_code_fkey">
+          <End Role="aircrafts_data" Type="Self.aircrafts_data" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="seats" Type="Self.seat" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="aircrafts_data">
+              <PropertyRef Name="aircraft_code" />
+            </Principal>
+            <Dependent Role="seats">
+              <PropertyRef Name="aircraft_code" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="flights_arrival_airport_fkey">
+          <End Role="airports_data" Type="Self.airports_data" Multiplicity="1" />
+          <End Role="flights" Type="Self.flight" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="airports_data">
+              <PropertyRef Name="airport_code" />
+            </Principal>
+            <Dependent Role="flights">
+              <PropertyRef Name="arrival_airport" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="flights_departure_airport_fkey">
+          <End Role="airports_data" Type="Self.airports_data" Multiplicity="1" />
+          <End Role="flights" Type="Self.flight" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="airports_data">
+              <PropertyRef Name="airport_code" />
+            </Principal>
+            <Dependent Role="flights">
+              <PropertyRef Name="departure_airport" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="boarding_passes_ticket_no_fkey">
+          <End Role="ticket_flights" Type="Self.ticket_flights" Multiplicity="1" />
+          <End Role="boarding_passes" Type="Self.boarding_passes" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ticket_flights">
+              <PropertyRef Name="ticket_no" />
+              <PropertyRef Name="flight_id" />
+            </Principal>
+            <Dependent Role="boarding_passes">
+              <PropertyRef Name="ticket_no" />
+              <PropertyRef Name="flight_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="tickets_book_ref_fkey">
+          <End Role="bookings" Type="Self.booking" Multiplicity="1" />
+          <End Role="tickets" Type="Self.ticket" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="bookings">
+              <PropertyRef Name="book_ref" />
+            </Principal>
+            <Dependent Role="tickets">
+              <PropertyRef Name="book_ref" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ticket_flights_flight_id_fkey">
+          <End Role="flights" Type="Self.flight" Multiplicity="1" />
+          <End Role="ticket_flights" Type="Self.ticket_flights" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="flights">
+              <PropertyRef Name="flight_id" />
+            </Principal>
+            <Dependent Role="ticket_flights">
+              <PropertyRef Name="flight_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ticket_flights_ticket_no_fkey">
+          <End Role="tickets" Type="Self.ticket" Multiplicity="1" />
+          <End Role="ticket_flights" Type="Self.ticket_flights" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tickets">
+              <PropertyRef Name="ticket_no" />
+            </Principal>
+            <Dependent Role="ticket_flights">
+              <PropertyRef Name="ticket_no" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DemoEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="aircrafts_data" EntityType="Self.aircrafts_data" />
+          <EntitySet Name="airports_data" EntityType="Self.airports_data" />
+          <EntitySet Name="boarding_passes" EntityType="Self.boarding_passes" />
+          <EntitySet Name="bookings" EntityType="Self.booking" />
+          <EntitySet Name="flights" EntityType="Self.flight" />
+          <EntitySet Name="seats" EntityType="Self.seat" />
+          <EntitySet Name="ticket_flights" EntityType="Self.ticket_flights" />
+          <EntitySet Name="tickets" EntityType="Self.ticket" />
+          <AssociationSet Name="flights_aircraft_code_fkey" Association="Self.flights_aircraft_code_fkey">
+            <End Role="aircrafts_data" EntitySet="aircrafts_data" />
+            <End Role="flights" EntitySet="flights" />
+          </AssociationSet>
+          <AssociationSet Name="seats_aircraft_code_fkey" Association="Self.seats_aircraft_code_fkey">
+            <End Role="aircrafts_data" EntitySet="aircrafts_data" />
+            <End Role="seats" EntitySet="seats" />
+          </AssociationSet>
+          <AssociationSet Name="flights_arrival_airport_fkey" Association="Self.flights_arrival_airport_fkey">
+            <End Role="airports_data" EntitySet="airports_data" />
+            <End Role="flights" EntitySet="flights" />
+          </AssociationSet>
+          <AssociationSet Name="flights_departure_airport_fkey" Association="Self.flights_departure_airport_fkey">
+            <End Role="airports_data" EntitySet="airports_data" />
+            <End Role="flights" EntitySet="flights" />
+          </AssociationSet>
+          <AssociationSet Name="boarding_passes_ticket_no_fkey" Association="Self.boarding_passes_ticket_no_fkey">
+            <End Role="ticket_flights" EntitySet="ticket_flights" />
+            <End Role="boarding_passes" EntitySet="boarding_passes" />
+          </AssociationSet>
+          <AssociationSet Name="tickets_book_ref_fkey" Association="Self.tickets_book_ref_fkey">
+            <End Role="bookings" EntitySet="bookings" />
+            <End Role="tickets" EntitySet="tickets" />
+          </AssociationSet>
+          <AssociationSet Name="ticket_flights_flight_id_fkey" Association="Self.ticket_flights_flight_id_fkey">
+            <End Role="flights" EntitySet="flights" />
+            <End Role="ticket_flights" EntitySet="ticket_flights" />
+          </AssociationSet>
+          <AssociationSet Name="ticket_flights_ticket_no_fkey" Association="Self.ticket_flights_ticket_no_fkey">
+            <End Role="tickets" EntitySet="tickets" />
+            <End Role="ticket_flights" EntitySet="ticket_flights" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="demoModelStoreContainer" CdmEntityContainer="DemoEntities">
+          <EntitySetMapping Name="aircrafts_data">
+            <EntityTypeMapping TypeName="demoModel.aircrafts_data">
+              <MappingFragment StoreEntitySet="aircrafts_data">
+                <ScalarProperty Name="aircraft_code" ColumnName="aircraft_code" />
+                <ScalarProperty Name="range" ColumnName="range" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="airports_data">
+            <EntityTypeMapping TypeName="demoModel.airports_data">
+              <MappingFragment StoreEntitySet="airports_data">
+                <ScalarProperty Name="airport_code" ColumnName="airport_code" />
+                <ScalarProperty Name="timezone" ColumnName="timezone" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="boarding_passes">
+            <EntityTypeMapping TypeName="demoModel.boarding_passes">
+              <MappingFragment StoreEntitySet="boarding_passes">
+                <ScalarProperty Name="ticket_no" ColumnName="ticket_no" />
+                <ScalarProperty Name="flight_id" ColumnName="flight_id" />
+                <ScalarProperty Name="boarding_no" ColumnName="boarding_no" />
+                <ScalarProperty Name="seat_no" ColumnName="seat_no" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="bookings">
+            <EntityTypeMapping TypeName="demoModel.booking">
+              <MappingFragment StoreEntitySet="bookings">
+                <ScalarProperty Name="book_ref" ColumnName="book_ref" />
+                <ScalarProperty Name="book_date" ColumnName="book_date" />
+                <ScalarProperty Name="total_amount" ColumnName="total_amount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="flights">
+            <EntityTypeMapping TypeName="demoModel.flight">
+              <MappingFragment StoreEntitySet="flights">
+                <ScalarProperty Name="flight_id" ColumnName="flight_id" />
+                <ScalarProperty Name="flight_no" ColumnName="flight_no" />
+                <ScalarProperty Name="scheduled_departure" ColumnName="scheduled_departure" />
+                <ScalarProperty Name="scheduled_arrival" ColumnName="scheduled_arrival" />
+                <ScalarProperty Name="departure_airport" ColumnName="departure_airport" />
+                <ScalarProperty Name="arrival_airport" ColumnName="arrival_airport" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="aircraft_code" ColumnName="aircraft_code" />
+                <ScalarProperty Name="actual_departure" ColumnName="actual_departure" />
+                <ScalarProperty Name="actual_arrival" ColumnName="actual_arrival" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="seats">
+            <EntityTypeMapping TypeName="demoModel.seat">
+              <MappingFragment StoreEntitySet="seats">
+                <ScalarProperty Name="aircraft_code" ColumnName="aircraft_code" />
+                <ScalarProperty Name="seat_no" ColumnName="seat_no" />
+                <ScalarProperty Name="fare_conditions" ColumnName="fare_conditions" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ticket_flights">
+            <EntityTypeMapping TypeName="demoModel.ticket_flights">
+              <MappingFragment StoreEntitySet="ticket_flights">
+                <ScalarProperty Name="ticket_no" ColumnName="ticket_no" />
+                <ScalarProperty Name="flight_id" ColumnName="flight_id" />
+                <ScalarProperty Name="fare_conditions" ColumnName="fare_conditions" />
+                <ScalarProperty Name="amount" ColumnName="amount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tickets">
+            <EntityTypeMapping TypeName="demoModel.ticket">
+              <MappingFragment StoreEntitySet="tickets">
+                <ScalarProperty Name="ticket_no" ColumnName="ticket_no" />
+                <ScalarProperty Name="book_ref" ColumnName="book_ref" />
+                <ScalarProperty Name="passenger_id" ColumnName="passenger_id" />
+                <ScalarProperty Name="passenger_name" ColumnName="passenger_name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

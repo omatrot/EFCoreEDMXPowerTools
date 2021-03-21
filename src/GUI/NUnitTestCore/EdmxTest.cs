@@ -201,6 +201,132 @@ namespace NUnitTestCore
             }
         }
 
+        [Test]
+        public void Issue551PostgreSQL()
+        {
+            // Arrange
+            var factory = new SqlServerEdmxDatabaseModelFactory(null);
+            var options = new DatabaseModelFactoryOptions(null, new List<string>());
+
+            // Act
+            var dbModel = factory.Create(TestPath("Airlines.edmx"), options);
+
+            // Assert
+            Assert.AreEqual(8, dbModel.Tables.Count());
+
+            // These tables have no FK
+            Assert.AreEqual(0, dbModel.Tables.Single(t => t.Name == "aircrafts_data").ForeignKeys.Count());
+            Assert.AreEqual(0, dbModel.Tables.Single(t => t.Name == "airports_data").ForeignKeys.Count());
+            Assert.AreEqual(0, dbModel.Tables.Single(t => t.Name == "bookings").ForeignKeys.Count());
+
+            // boarding_passes
+            {
+                var customerAddressTable = dbModel.Tables.Single(t => t.Name == "boarding_passes");
+                Assert.AreEqual(4, customerAddressTable.Columns.Count());
+                Assert.AreEqual(1, customerAddressTable.ForeignKeys.Count());
+
+                {
+                    // boarding_passes_ticket_no_fkey
+                    var fkboarding_passes_ticket_no_fkey = customerAddressTable.ForeignKeys.SingleOrDefault(fk => fk.Name == "boarding_passes_ticket_no_fkey");
+                    Assert.NotNull(fkboarding_passes_ticket_no_fkey);
+                    Assert.NotNull(fkboarding_passes_ticket_no_fkey.PrincipalTable);
+                    Assert.AreEqual("ticket_flights", fkboarding_passes_ticket_no_fkey.PrincipalTable.Name);
+                    Assert.AreEqual(2, fkboarding_passes_ticket_no_fkey.PrincipalColumns.Count());
+                    Assert.AreEqual("ticket_no", fkboarding_passes_ticket_no_fkey.PrincipalColumns.First().Name);
+                    Assert.AreEqual("flight_id", fkboarding_passes_ticket_no_fkey.PrincipalColumns.Last().Name);
+                }
+            }
+
+            // flights
+            {
+                var flightsTable = dbModel.Tables.Single(t => t.Name == "flights");
+                Assert.AreEqual(10, flightsTable.Columns.Count());
+                Assert.AreEqual(3, flightsTable.ForeignKeys.Count());
+
+                {
+                    // flights_aircraft_code_fkey
+                    var fkflights_aircraft_code_fkey = flightsTable.ForeignKeys.SingleOrDefault(fk => fk.Name == "flights_aircraft_code_fkey");
+                    Assert.NotNull(fkflights_aircraft_code_fkey);
+                    Assert.NotNull(fkflights_aircraft_code_fkey.PrincipalTable);
+                    Assert.AreEqual("aircrafts_data", fkflights_aircraft_code_fkey.PrincipalTable.Name);
+                    Assert.AreEqual(1, fkflights_aircraft_code_fkey.PrincipalColumns.Count());
+                    Assert.AreEqual("aircraft_code", fkflights_aircraft_code_fkey.PrincipalColumns.First().Name);
+                }
+                {
+                    // flights_arrival_airport_fkey
+                    var fkflights_arrival_airport_fkey = flightsTable.ForeignKeys.SingleOrDefault(fk => fk.Name == "flights_arrival_airport_fkey");
+                    Assert.NotNull(fkflights_arrival_airport_fkey);
+                    Assert.NotNull(fkflights_arrival_airport_fkey.PrincipalTable);
+                    Assert.AreEqual("airports_data", fkflights_arrival_airport_fkey.PrincipalTable.Name);
+                    Assert.AreEqual(1, fkflights_arrival_airport_fkey.PrincipalColumns.Count());
+                    Assert.AreEqual("airport_code", fkflights_arrival_airport_fkey.PrincipalColumns.First().Name);
+                }
+            }
+
+            // seats
+            {
+
+                var seats = dbModel.Tables.Single(t => t.Name == "seats");
+                Assert.AreEqual(3, seats.Columns.Count());
+                Assert.AreEqual(1, seats.ForeignKeys.Count());
+                {
+                    {
+                        // seats_aircraft_code_fkey
+                        var fkseats_aircraft_code_fkey = seats.ForeignKeys.SingleOrDefault(fk => fk.Name == "seats_aircraft_code_fkey");
+                        Assert.NotNull(fkseats_aircraft_code_fkey);
+                        Assert.NotNull(fkseats_aircraft_code_fkey.PrincipalTable);
+                        Assert.AreEqual("aircrafts_data", fkseats_aircraft_code_fkey.PrincipalTable.Name);
+                        Assert.AreEqual(1, fkseats_aircraft_code_fkey.PrincipalColumns.Count());
+                        Assert.AreEqual("aircraft_code", fkseats_aircraft_code_fkey.PrincipalColumns.First().Name);
+                    }
+                }
+            }
+
+            // ticket_flights
+            {
+                var ticket_flightsTable = dbModel.Tables.Single(t => t.Name == "ticket_flights");
+                Assert.AreEqual(4, ticket_flightsTable.Columns.Count());
+                Assert.AreEqual(2, ticket_flightsTable.ForeignKeys.Count());
+
+                {
+                    // ticket_flights_flight_id_fkey
+                    var fkticket_flights_flight_id_fkey = ticket_flightsTable.ForeignKeys.SingleOrDefault(fk => fk.Name == "ticket_flights_flight_id_fkey");
+                    Assert.NotNull(fkticket_flights_flight_id_fkey);
+                    Assert.NotNull(fkticket_flights_flight_id_fkey.PrincipalTable);
+                    Assert.AreEqual("flights", fkticket_flights_flight_id_fkey.PrincipalTable.Name);
+                    Assert.AreEqual(1, fkticket_flights_flight_id_fkey.PrincipalColumns.Count());
+                    Assert.AreEqual("flight_id", fkticket_flights_flight_id_fkey.PrincipalColumns.First().Name);
+                }
+
+                {
+                    // ticket_flights_ticket_no_fkey
+                    var fkticket_flights_ticket_no_fkey = ticket_flightsTable.ForeignKeys.SingleOrDefault(fk => fk.Name == "ticket_flights_ticket_no_fkey");
+                    Assert.NotNull(fkticket_flights_ticket_no_fkey);
+                    Assert.NotNull(fkticket_flights_ticket_no_fkey.PrincipalTable);
+                    Assert.AreEqual("tickets", fkticket_flights_ticket_no_fkey.PrincipalTable.Name);
+                    Assert.AreEqual(1, fkticket_flights_ticket_no_fkey.PrincipalColumns.Count());
+                    Assert.AreEqual("ticket_no", fkticket_flights_ticket_no_fkey.PrincipalColumns.First().Name);
+                }
+            }
+
+            // tickets
+            {
+                var ticketsTable = dbModel.Tables.Single(t => t.Name == "tickets");
+                Assert.AreEqual(4, ticketsTable.Columns.Count());
+                Assert.AreEqual(1, ticketsTable.ForeignKeys.Count());
+
+                {
+                    // FK_SalesOrderHeader_Address_BillTo_AddressID
+                    var fktickets_book_ref_fkey = ticketsTable.ForeignKeys.SingleOrDefault(fk => fk.Name == "tickets_book_ref_fkey");
+                    Assert.NotNull(fktickets_book_ref_fkey);
+                    Assert.NotNull(fktickets_book_ref_fkey.PrincipalTable);
+                    Assert.AreEqual("bookings", fktickets_book_ref_fkey.PrincipalTable.Name);
+                    Assert.AreEqual(1, fktickets_book_ref_fkey.PrincipalColumns.Count());
+                    Assert.AreEqual("book_ref", fktickets_book_ref_fkey.PrincipalColumns.First().Name);
+                }
+            }
+        }
+
         private string TestPath(string file)
         {
             return Path.Combine(TestContext.CurrentContext.TestDirectory, file);
