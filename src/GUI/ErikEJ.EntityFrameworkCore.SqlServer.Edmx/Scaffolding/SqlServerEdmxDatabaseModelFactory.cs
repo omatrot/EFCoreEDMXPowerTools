@@ -90,10 +90,10 @@ namespace ErikEJ.EntityFrameworkCore.SqlServer.Edmx.Scaffolding
             if (string.Compare(edmxVersion, @"3.0", StringComparison.InvariantCultureIgnoreCase) == 0)
             {
                 var edmxv3 = EdmxV3.Load(edmxPath);
-                if (!edmxv3.Runtimes[0].StorageModels.StorageSchema.Provider.Equals("System.Data.SqlClient", StringComparison.Ordinal))
-                {
-                    throw new NotSupportedException("Only SQL Server EDMX files are currently supported");
-                }
+                //if (!edmxv3.Runtimes[0].StorageModels.StorageSchema.Provider.Equals("System.Data.SqlClient", StringComparison.Ordinal))
+                //{
+                //    throw new NotSupportedException("Only SQL Server EDMX files are currently supported");
+                //}
 
                 var items = edmxv3.GetItems<LinqToEdmx.Model.StorageV3.EntityTypeStore>();
 

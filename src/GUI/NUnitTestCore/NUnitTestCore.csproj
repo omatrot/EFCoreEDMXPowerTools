@@ -11,6 +11,7 @@
     <None Remove="Aw2014Person.txt" />
     <None Remove="Chinook.dacpac" />
     <None Remove="ChinookContext.txt" />
+    <None Remove="Examples.edmx" />
     <None Remove="Identity.txt" />
     <None Remove="Issue208.dacpac" />
     <None Remove="Issue210.dacpac" />
@@ -77,6 +78,9 @@
     </Content>
     <Content Include="Dacpac\TestDb.dacpac">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Examples.edmx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

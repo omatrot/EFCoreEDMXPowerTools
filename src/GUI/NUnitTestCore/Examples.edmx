@@ -1,0 +1,532 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="examples.fdbModel.Store" Provider="FirebirdSql.Data.FirebirdClient" ProviderManifestToken="3.0" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CUSTOMER">
+          <Key>
+            <PropertyRef Name="CUSTOMER_ID" />
+          </Key>
+          <Property Name="CUSTOMER_ID" Type="int" Nullable="false" />
+          <Property Name="NAME" Type="varchar" MaxLength="60" Unicode="true" Nullable="false" />
+          <Property Name="ADDRESS" Type="varchar" MaxLength="250" Unicode="true" />
+          <Property Name="ZIPCODE" Type="char" MaxLength="10" Unicode="false" />
+          <Property Name="PHONE" Type="varchar" MaxLength="14" Unicode="true" />
+        </EntityType>
+        <EntityType Name="INVOICE">
+          <Key>
+            <PropertyRef Name="INVOICE_ID" />
+          </Key>
+          <Property Name="INVOICE_ID" Type="int" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="int" Nullable="false" />
+          <Property Name="INVOICE_DATE" Type="timestamp" />
+          <Property Name="TOTAL_SALE" Type="numeric" Precision="15" Scale="2" />
+          <Property Name="PAID" Type="smallint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="INVOICE_LINE">
+          <Key>
+            <PropertyRef Name="INVOICE_LINE_ID" />
+          </Key>
+          <Property Name="INVOICE_LINE_ID" Type="int" Nullable="false" />
+          <Property Name="INVOICE_ID" Type="int" Nullable="false" />
+          <Property Name="PRODUCT_ID" Type="int" Nullable="false" />
+          <Property Name="QUANTITY" Type="numeric" Precision="15" Scale="0" Nullable="false" />
+          <Property Name="SALE_PRICE" Type="numeric" Precision="15" Scale="2" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Firebird.Firebird.migrations' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="migrations">
+          <Key>
+            <PropertyRef Name="migration" />
+            <PropertyRef Name="batch" />
+          </Key>
+          <Property Name="migration" Type="varchar" MaxLength="255" Unicode="true" Nullable="false" />
+          <Property Name="batch" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Firebird.Firebird.password_resets' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="password_resets">
+          <Key>
+            <PropertyRef Name="email" />
+            <PropertyRef Name="token" />
+          </Key>
+          <Property Name="email" Type="varchar" MaxLength="255" Unicode="true" Nullable="false" />
+          <Property Name="token" Type="varchar" MaxLength="255" Unicode="true" Nullable="false" />
+          <Property Name="created_at" Type="timestamp" />
+        </EntityType>
+        <EntityType Name="PRODUCT">
+          <Key>
+            <PropertyRef Name="PRODUCT_ID" />
+          </Key>
+          <Property Name="PRODUCT_ID" Type="int" Nullable="false" />
+          <Property Name="NAME" Type="varchar" MaxLength="100" Unicode="true" Nullable="false" />
+          <Property Name="PRICE" Type="numeric" Precision="15" Scale="2" Nullable="false" />
+          <Property Name="DESCRIPTION" Type="clob" Unicode="true" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="255" Unicode="true" Nullable="false" />
+          <Property Name="email" Type="varchar" MaxLength="255" Unicode="true" Nullable="false" />
+          <Property Name="password" Type="varchar" MaxLength="255" Unicode="true" Nullable="false" />
+          <Property Name="remember_token" Type="varchar" MaxLength="100" Unicode="true" />
+          <Property Name="created_at" Type="timestamp" />
+          <Property Name="updated_at" Type="timestamp" />
+        </EntityType>
+        <EntityType Name="WEBROLE">
+          <Key>
+            <PropertyRef Name="WEBROLE_ID" />
+          </Key>
+          <Property Name="WEBROLE_ID" Type="int" Nullable="false" />
+          <Property Name="NAME" Type="varchar" MaxLength="63" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WEBUSER">
+          <Key>
+            <PropertyRef Name="WEBUSER_ID" />
+          </Key>
+          <Property Name="WEBUSER_ID" Type="int" Nullable="false" />
+          <Property Name="EMAIL" Type="varchar" MaxLength="63" Unicode="true" Nullable="false" />
+          <Property Name="PASSWD" Type="varchar" MaxLength="63" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WEBUSERINROLE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="WEBUSER_ID" Type="int" Nullable="false" />
+          <Property Name="WEBROLE_ID" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_INVOCE_CUSTOMER">
+          <End Role="CUSTOMER" Type="Self.CUSTOMER" Multiplicity="1" />
+          <End Role="INVOICE" Type="Self.INVOICE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CUSTOMER">
+              <PropertyRef Name="CUSTOMER_ID" />
+            </Principal>
+            <Dependent Role="INVOICE">
+              <PropertyRef Name="CUSTOMER_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INVOICE_LINE_INVOICE">
+          <End Role="INVOICE" Type="Self.INVOICE" Multiplicity="1" />
+          <End Role="INVOICE_LINE" Type="Self.INVOICE_LINE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="INVOICE">
+              <PropertyRef Name="INVOICE_ID" />
+            </Principal>
+            <Dependent Role="INVOICE_LINE">
+              <PropertyRef Name="INVOICE_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INVOICE_LINE_PRODUCT">
+          <End Role="PRODUCT" Type="Self.PRODUCT" Multiplicity="1" />
+          <End Role="INVOICE_LINE" Type="Self.INVOICE_LINE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PRODUCT">
+              <PropertyRef Name="PRODUCT_ID" />
+            </Principal>
+            <Dependent Role="INVOICE_LINE">
+              <PropertyRef Name="PRODUCT_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WEBUSERINROLE_ROLE">
+          <End Role="WEBROLE" Type="Self.WEBROLE" Multiplicity="1" />
+          <End Role="WEBUSERINROLE" Type="Self.WEBUSERINROLE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="WEBROLE">
+              <PropertyRef Name="WEBROLE_ID" />
+            </Principal>
+            <Dependent Role="WEBUSERINROLE">
+              <PropertyRef Name="WEBROLE_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WEBUSERINROLE_USER">
+          <End Role="WEBUSER" Type="Self.WEBUSER" Multiplicity="1" />
+          <End Role="WEBUSERINROLE" Type="Self.WEBUSERINROLE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="WEBUSER">
+              <PropertyRef Name="WEBUSER_ID" />
+            </Principal>
+            <Dependent Role="WEBUSERINROLE">
+              <PropertyRef Name="WEBUSER_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="examplesfdbModelStoreContainer">
+          <EntitySet Name="CUSTOMER" EntityType="Self.CUSTOMER" Schema="Firebird" store:Type="Tables" />
+          <EntitySet Name="INVOICE" EntityType="Self.INVOICE" Schema="Firebird" store:Type="Tables" />
+          <EntitySet Name="INVOICE_LINE" EntityType="Self.INVOICE_LINE" Schema="Firebird" store:Type="Tables" />
+          <EntitySet Name="PRODUCT" EntityType="Self.PRODUCT" Schema="Firebird" store:Type="Tables" />
+          <EntitySet Name="users" EntityType="Self.users" Schema="Firebird" store:Type="Tables" />
+          <EntitySet Name="WEBROLE" EntityType="Self.WEBROLE" Schema="Firebird" store:Type="Tables" />
+          <EntitySet Name="WEBUSER" EntityType="Self.WEBUSER" Schema="Firebird" store:Type="Tables" />
+          <EntitySet Name="WEBUSERINROLE" EntityType="Self.WEBUSERINROLE" Schema="Firebird" store:Type="Tables" />
+          <EntitySet Name="migrations" EntityType="Self.migrations" store:Type="Tables" store:Schema="Firebird">
+            <DefiningQuery>SELECT 
+"A"."migration" AS "migration", 
+"A"."batch" AS "batch"
+FROM "migrations" AS "A"</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="password_resets" EntityType="Self.password_resets" store:Type="Tables" store:Schema="Firebird">
+            <DefiningQuery>SELECT 
+"A"."email" AS "email", 
+"A"."token" AS "token", 
+"A"."created_at" AS "created_at"
+FROM "password_resets" AS "A"</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_INVOCE_CUSTOMER" Association="Self.FK_INVOCE_CUSTOMER">
+            <End Role="CUSTOMER" EntitySet="CUSTOMER" />
+            <End Role="INVOICE" EntitySet="INVOICE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_INVOICE_LINE_INVOICE" Association="Self.FK_INVOICE_LINE_INVOICE">
+            <End Role="INVOICE" EntitySet="INVOICE" />
+            <End Role="INVOICE_LINE" EntitySet="INVOICE_LINE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_INVOICE_LINE_PRODUCT" Association="Self.FK_INVOICE_LINE_PRODUCT">
+            <End Role="PRODUCT" EntitySet="PRODUCT" />
+            <End Role="INVOICE_LINE" EntitySet="INVOICE_LINE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WEBUSERINROLE_ROLE" Association="Self.FK_WEBUSERINROLE_ROLE">
+            <End Role="WEBROLE" EntitySet="WEBROLE" />
+            <End Role="WEBUSERINROLE" EntitySet="WEBUSERINROLE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WEBUSERINROLE_USER" Association="Self.FK_WEBUSERINROLE_USER">
+            <End Role="WEBUSER" EntitySet="WEBUSER" />
+            <End Role="WEBUSERINROLE" EntitySet="WEBUSERINROLE" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="examples.fdbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="CUSTOMER">
+          <Key>
+            <PropertyRef Name="CUSTOMER_ID" />
+          </Key>
+          <Property Name="CUSTOMER_ID" Type="Int32" Nullable="false" />
+          <Property Name="NAME" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ADDRESS" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="ZIPCODE" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+          <Property Name="PHONE" Type="String" MaxLength="14" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="INVOICEs" Relationship="Self.FK_INVOCE_CUSTOMER" FromRole="CUSTOMER" ToRole="INVOICE" />
+        </EntityType>
+        <EntityType Name="INVOICE">
+          <Key>
+            <PropertyRef Name="INVOICE_ID" />
+          </Key>
+          <Property Name="INVOICE_ID" Type="Int32" Nullable="false" />
+          <Property Name="CUSTOMER_ID" Type="Int32" Nullable="false" />
+          <Property Name="INVOICE_DATE" Type="DateTime" />
+          <Property Name="TOTAL_SALE" Type="Decimal" Precision="15" Scale="2" />
+          <Property Name="PAID" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="CUSTOMER" Relationship="Self.FK_INVOCE_CUSTOMER" FromRole="INVOICE" ToRole="CUSTOMER" />
+          <NavigationProperty Name="INVOICE_LINE" Relationship="Self.FK_INVOICE_LINE_INVOICE" FromRole="INVOICE" ToRole="INVOICE_LINE" />
+        </EntityType>
+        <EntityType Name="INVOICE_LINE">
+          <Key>
+            <PropertyRef Name="INVOICE_LINE_ID" />
+          </Key>
+          <Property Name="INVOICE_LINE_ID" Type="Int32" Nullable="false" />
+          <Property Name="INVOICE_ID" Type="Int32" Nullable="false" />
+          <Property Name="PRODUCT_ID" Type="Int32" Nullable="false" />
+          <Property Name="QUANTITY" Type="Decimal" Precision="15" Scale="0" Nullable="false" />
+          <Property Name="SALE_PRICE" Type="Decimal" Precision="15" Scale="2" Nullable="false" />
+          <NavigationProperty Name="INVOICE" Relationship="Self.FK_INVOICE_LINE_INVOICE" FromRole="INVOICE_LINE" ToRole="INVOICE" />
+          <NavigationProperty Name="PRODUCT" Relationship="Self.FK_INVOICE_LINE_PRODUCT" FromRole="INVOICE_LINE" ToRole="PRODUCT" />
+        </EntityType>
+        <EntityType Name="PRODUCT">
+          <Key>
+            <PropertyRef Name="PRODUCT_ID" />
+          </Key>
+          <Property Name="PRODUCT_ID" Type="Int32" Nullable="false" />
+          <Property Name="NAME" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PRICE" Type="Decimal" Precision="15" Scale="2" Nullable="false" />
+          <Property Name="DESCRIPTION" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="INVOICE_LINE" Relationship="Self.FK_INVOICE_LINE_PRODUCT" FromRole="PRODUCT" ToRole="INVOICE_LINE" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="password" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="remember_token" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="created_at" Type="DateTime" />
+          <Property Name="updated_at" Type="DateTime" />
+        </EntityType>
+        <EntityType Name="WEBROLE">
+          <Key>
+            <PropertyRef Name="WEBROLE_ID" />
+          </Key>
+          <Property Name="WEBROLE_ID" Type="Int32" Nullable="false" />
+          <Property Name="NAME" Type="String" MaxLength="63" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="WEBUSERINROLEs" Relationship="Self.FK_WEBUSERINROLE_ROLE" FromRole="WEBROLE" ToRole="WEBUSERINROLE" />
+        </EntityType>
+        <EntityType Name="WEBUSER">
+          <Key>
+            <PropertyRef Name="WEBUSER_ID" />
+          </Key>
+          <Property Name="WEBUSER_ID" Type="Int32" Nullable="false" />
+          <Property Name="EMAIL" Type="String" MaxLength="63" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PASSWD" Type="String" MaxLength="63" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="WEBUSERINROLEs" Relationship="Self.FK_WEBUSERINROLE_USER" FromRole="WEBUSER" ToRole="WEBUSERINROLE" />
+        </EntityType>
+        <EntityType Name="WEBUSERINROLE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="WEBUSER_ID" Type="Int32" Nullable="false" />
+          <Property Name="WEBROLE_ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="WEBROLE" Relationship="Self.FK_WEBUSERINROLE_ROLE" FromRole="WEBUSERINROLE" ToRole="WEBROLE" />
+          <NavigationProperty Name="WEBUSER" Relationship="Self.FK_WEBUSERINROLE_USER" FromRole="WEBUSERINROLE" ToRole="WEBUSER" />
+        </EntityType>
+        <EntityType Name="migration">
+          <Key>
+            <PropertyRef Name="migration1" />
+            <PropertyRef Name="batch" />
+          </Key>
+          <Property Name="migration1" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="batch" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="password_resets">
+          <Key>
+            <PropertyRef Name="email" />
+            <PropertyRef Name="token" />
+          </Key>
+          <Property Name="email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="token" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="created_at" Type="DateTime" />
+        </EntityType>
+        <Association Name="FK_INVOCE_CUSTOMER">
+          <End Role="CUSTOMER" Type="Self.CUSTOMER" Multiplicity="1" />
+          <End Role="INVOICE" Type="Self.INVOICE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CUSTOMER">
+              <PropertyRef Name="CUSTOMER_ID" />
+            </Principal>
+            <Dependent Role="INVOICE">
+              <PropertyRef Name="CUSTOMER_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INVOICE_LINE_INVOICE">
+          <End Role="INVOICE" Type="Self.INVOICE" Multiplicity="1" />
+          <End Role="INVOICE_LINE" Type="Self.INVOICE_LINE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="INVOICE">
+              <PropertyRef Name="INVOICE_ID" />
+            </Principal>
+            <Dependent Role="INVOICE_LINE">
+              <PropertyRef Name="INVOICE_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_INVOICE_LINE_PRODUCT">
+          <End Role="PRODUCT" Type="Self.PRODUCT" Multiplicity="1" />
+          <End Role="INVOICE_LINE" Type="Self.INVOICE_LINE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PRODUCT">
+              <PropertyRef Name="PRODUCT_ID" />
+            </Principal>
+            <Dependent Role="INVOICE_LINE">
+              <PropertyRef Name="PRODUCT_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WEBUSERINROLE_ROLE">
+          <End Role="WEBROLE" Type="Self.WEBROLE" Multiplicity="1" />
+          <End Role="WEBUSERINROLE" Type="Self.WEBUSERINROLE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="WEBROLE">
+              <PropertyRef Name="WEBROLE_ID" />
+            </Principal>
+            <Dependent Role="WEBUSERINROLE">
+              <PropertyRef Name="WEBROLE_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WEBUSERINROLE_USER">
+          <End Role="WEBUSER" Type="Self.WEBUSER" Multiplicity="1" />
+          <End Role="WEBUSERINROLE" Type="Self.WEBUSERINROLE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="WEBUSER">
+              <PropertyRef Name="WEBUSER_ID" />
+            </Principal>
+            <Dependent Role="WEBUSERINROLE">
+              <PropertyRef Name="WEBUSER_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="CUSTOMERs" EntityType="Self.CUSTOMER" />
+          <EntitySet Name="INVOICEs" EntityType="Self.INVOICE" />
+          <EntitySet Name="INVOICE_LINE" EntityType="Self.INVOICE_LINE" />
+          <EntitySet Name="PRODUCTs" EntityType="Self.PRODUCT" />
+          <EntitySet Name="users" EntityType="Self.user" />
+          <EntitySet Name="WEBROLEs" EntityType="Self.WEBROLE" />
+          <EntitySet Name="WEBUSERs" EntityType="Self.WEBUSER" />
+          <EntitySet Name="WEBUSERINROLEs" EntityType="Self.WEBUSERINROLE" />
+          <EntitySet Name="migrations" EntityType="Self.migration" />
+          <EntitySet Name="password_resets" EntityType="Self.password_resets" />
+          <AssociationSet Name="FK_INVOCE_CUSTOMER" Association="Self.FK_INVOCE_CUSTOMER">
+            <End Role="CUSTOMER" EntitySet="CUSTOMERs" />
+            <End Role="INVOICE" EntitySet="INVOICEs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_INVOICE_LINE_INVOICE" Association="Self.FK_INVOICE_LINE_INVOICE">
+            <End Role="INVOICE" EntitySet="INVOICEs" />
+            <End Role="INVOICE_LINE" EntitySet="INVOICE_LINE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_INVOICE_LINE_PRODUCT" Association="Self.FK_INVOICE_LINE_PRODUCT">
+            <End Role="PRODUCT" EntitySet="PRODUCTs" />
+            <End Role="INVOICE_LINE" EntitySet="INVOICE_LINE" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WEBUSERINROLE_ROLE" Association="Self.FK_WEBUSERINROLE_ROLE">
+            <End Role="WEBROLE" EntitySet="WEBROLEs" />
+            <End Role="WEBUSERINROLE" EntitySet="WEBUSERINROLEs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WEBUSERINROLE_USER" Association="Self.FK_WEBUSERINROLE_USER">
+            <End Role="WEBUSER" EntitySet="WEBUSERs" />
+            <End Role="WEBUSERINROLE" EntitySet="WEBUSERINROLEs" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="examplesfdbModelStoreContainer" CdmEntityContainer="Entities">
+          <EntitySetMapping Name="CUSTOMERs">
+            <EntityTypeMapping TypeName="examples.fdbModel.CUSTOMER">
+              <MappingFragment StoreEntitySet="CUSTOMER">
+                <ScalarProperty Name="CUSTOMER_ID" ColumnName="CUSTOMER_ID" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="ADDRESS" ColumnName="ADDRESS" />
+                <ScalarProperty Name="ZIPCODE" ColumnName="ZIPCODE" />
+                <ScalarProperty Name="PHONE" ColumnName="PHONE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="INVOICEs">
+            <EntityTypeMapping TypeName="examples.fdbModel.INVOICE">
+              <MappingFragment StoreEntitySet="INVOICE">
+                <ScalarProperty Name="INVOICE_ID" ColumnName="INVOICE_ID" />
+                <ScalarProperty Name="CUSTOMER_ID" ColumnName="CUSTOMER_ID" />
+                <ScalarProperty Name="INVOICE_DATE" ColumnName="INVOICE_DATE" />
+                <ScalarProperty Name="TOTAL_SALE" ColumnName="TOTAL_SALE" />
+                <ScalarProperty Name="PAID" ColumnName="PAID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="INVOICE_LINE">
+            <EntityTypeMapping TypeName="examples.fdbModel.INVOICE_LINE">
+              <MappingFragment StoreEntitySet="INVOICE_LINE">
+                <ScalarProperty Name="INVOICE_LINE_ID" ColumnName="INVOICE_LINE_ID" />
+                <ScalarProperty Name="INVOICE_ID" ColumnName="INVOICE_ID" />
+                <ScalarProperty Name="PRODUCT_ID" ColumnName="PRODUCT_ID" />
+                <ScalarProperty Name="QUANTITY" ColumnName="QUANTITY" />
+                <ScalarProperty Name="SALE_PRICE" ColumnName="SALE_PRICE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PRODUCTs">
+            <EntityTypeMapping TypeName="examples.fdbModel.PRODUCT">
+              <MappingFragment StoreEntitySet="PRODUCT">
+                <ScalarProperty Name="PRODUCT_ID" ColumnName="PRODUCT_ID" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="PRICE" ColumnName="PRICE" />
+                <ScalarProperty Name="DESCRIPTION" ColumnName="DESCRIPTION" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users">
+            <EntityTypeMapping TypeName="examples.fdbModel.user">
+              <MappingFragment StoreEntitySet="users">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="remember_token" ColumnName="remember_token" />
+                <ScalarProperty Name="created_at" ColumnName="created_at" />
+                <ScalarProperty Name="updated_at" ColumnName="updated_at" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WEBROLEs">
+            <EntityTypeMapping TypeName="examples.fdbModel.WEBROLE">
+              <MappingFragment StoreEntitySet="WEBROLE">
+                <ScalarProperty Name="WEBROLE_ID" ColumnName="WEBROLE_ID" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WEBUSERs">
+            <EntityTypeMapping TypeName="examples.fdbModel.WEBUSER">
+              <MappingFragment StoreEntitySet="WEBUSER">
+                <ScalarProperty Name="WEBUSER_ID" ColumnName="WEBUSER_ID" />
+                <ScalarProperty Name="EMAIL" ColumnName="EMAIL" />
+                <ScalarProperty Name="PASSWD" ColumnName="PASSWD" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WEBUSERINROLEs">
+            <EntityTypeMapping TypeName="examples.fdbModel.WEBUSERINROLE">
+              <MappingFragment StoreEntitySet="WEBUSERINROLE">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="WEBUSER_ID" ColumnName="WEBUSER_ID" />
+                <ScalarProperty Name="WEBROLE_ID" ColumnName="WEBROLE_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="migrations">
+            <EntityTypeMapping TypeName="examples.fdbModel.migration">
+              <MappingFragment StoreEntitySet="migrations">
+                <ScalarProperty Name="migration1" ColumnName="migration" />
+                <ScalarProperty Name="batch" ColumnName="batch" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="password_resets">
+            <EntityTypeMapping TypeName="examples.fdbModel.password_resets">
+              <MappingFragment StoreEntitySet="password_resets">
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="token" ColumnName="token" />
+                <ScalarProperty Name="created_at" ColumnName="created_at" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

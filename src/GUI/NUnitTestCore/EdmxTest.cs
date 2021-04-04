@@ -201,6 +201,20 @@ namespace NUnitTestCore
             }
         }
 
+        [Test]
+        public void Issue904FireBird()
+        {
+            // Arrange
+            var factory = new SqlServerEdmxDatabaseModelFactory(null);
+            var options = new DatabaseModelFactoryOptions(null, new List<string>());
+
+            // Act
+            var dbModel = factory.Create(TestPath("Examples.edmx"), options);
+
+            // Assert
+            Assert.AreEqual(10, dbModel.Tables.Count());
+        }
+
         private string TestPath(string file)
         {
             return Path.Combine(TestContext.CurrentContext.TestDirectory, file);
