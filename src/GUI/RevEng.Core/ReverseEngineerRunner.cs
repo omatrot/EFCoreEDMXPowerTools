@@ -82,7 +82,7 @@ namespace RevEng.Core
             var entityTypeConfigurationPaths = new List<string>();
             SavedModelFiles procedurePaths = null;
             SavedModelFiles functionPaths = null;
-            
+
             SavedModelFiles filePaths = ReverseEngineerScaffolder.GenerateDbContext(options, serviceProvider, schemas, outputContextDir, modelNamespace, contextNamespace);
 
             if (options.SelectedToBeGenerated != 2)
@@ -94,14 +94,26 @@ namespace RevEng.Core
 #else
                 RemoveOnConfiguring(filePaths.ContextFile, options.IncludeConnectionString);
 #endif
-                PostProcess(filePaths.ContextFile);
+                if (!options.UseHandleBars)
+                {
+                    PostProcess(filePaths.ContextFile);
+                }
 
                 entityTypeConfigurationPaths = SplitDbContext(filePaths.ContextFile, options.UseDbContextSplitting, contextNamespace, options.UseNullableReferences);
             }
-
-            foreach (var file in filePaths.AdditionalFiles)
+            else if (options.SelectedToBeGenerated == 2
+                && (options.Tables.Count(t => t.ObjectType == ObjectType.Procedure) > 0
+                || options.Tables.Count(t => t.ObjectType == ObjectType.ScalarFunction) > 0))
             {
-                PostProcess(file);
+                warnings.Add("Selected stored procedures/scalar functions will not be generated, as 'Entity Types only' was selected");
+            }
+
+            if (!options.UseHandleBars)
+            {
+                foreach (var file in filePaths.AdditionalFiles)
+                {
+                    PostProcess(file);
+                }
             }
 
             var cleanUpPaths = CreateCleanupPaths(procedurePaths, functionPaths, filePaths);
@@ -167,7 +179,7 @@ namespace RevEng.Core
         {
             if (string.IsNullOrEmpty(contextFile))
             {
-                return;            
+                return;
             }
 
             var finalLines = new List<string>();
@@ -212,8 +224,8 @@ namespace RevEng.Core
             }
 
             var text = File.ReadAllText(file, Encoding.UTF8);
-            File.WriteAllText(file, PathHelper.Header 
-                + Environment.NewLine 
+            File.WriteAllText(file, PathHelper.Header
+                + Environment.NewLine
                 + text.Replace(";Command Timeout=300", string.Empty, StringComparison.OrdinalIgnoreCase)
                 .Replace(";Trust Server Certificate=True", string.Empty, StringComparison.OrdinalIgnoreCase)
                 .TrimEnd(), Encoding.UTF8)

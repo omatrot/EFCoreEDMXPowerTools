@@ -7,17 +7,19 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EFCorePowerTools.Handlers.ReverseEngineer
 {
     public class EfRevEngLauncher
     {
         private readonly ReverseEngineerCommandOptions options;
-        private readonly bool useEFCore5;
+        private readonly CodeGenerationMode codeGenerationMode;
         private readonly string revengFolder;
+        private readonly string revengRoot;
         private readonly ResultDeserializer resultDeserializer;
 
-        public static ReverseEngineerResult LaunchExternalRunner(ReverseEngineerOptions options, bool useEFCore5)
+        public static async Task<ReverseEngineerResult> LaunchExternalRunnerAsync(ReverseEngineerOptions options, CodeGenerationMode codeGenerationMode)
         {
             var commandOptions = new ReverseEngineerCommandOptions
             {
@@ -53,27 +55,40 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
                 ProceduresReturnList = options.ProceduresReturnList,
             };
 
-            var launcher = new EfRevEngLauncher(commandOptions, useEFCore5);
-            return launcher.GetOutput();
+            var launcher = new EfRevEngLauncher(commandOptions, codeGenerationMode);
+            return await launcher.GetOutputAsync();
         }
 
-        public EfRevEngLauncher(ReverseEngineerCommandOptions options, bool useEFCore5)
+        public EfRevEngLauncher(ReverseEngineerCommandOptions options, CodeGenerationMode codeGenerationMode)
         {
             this.options = options;
-            this.useEFCore5 = useEFCore5;
+            this.codeGenerationMode = codeGenerationMode;
             var versionSuffix = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            revengFolder = useEFCore5 ? "efreveng5." : "efreveng3.";
+
+            revengFolder = "efreveng3.";
+
+            switch (codeGenerationMode)
+            {
+                case CodeGenerationMode.EFCore5:
+                    revengFolder = "efreveng5.";
+                    break;
+                case CodeGenerationMode.EFCore3:
+                    revengFolder = "efreveng3.";
+                    break;
+                case CodeGenerationMode.EFCore6:
+                    revengFolder = "efreveng6.";
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            revengRoot = revengFolder;
+
             revengFolder += versionSuffix;
             resultDeserializer = new ResultDeserializer();
         }
 
-        public List<TableModel> GetDacpacTables(string dacpacPath)
-        {
-            var arguments = "\"" + dacpacPath + "\"";
-            return GetTablesInternal(arguments);
-        }
-
-        public List<TableModel> GetTables(string connectionString, DatabaseType databaseType, SchemaInfo[] schemas)
+        public async Task<List<TableModel>> GetTablesAsync(string connectionString, DatabaseType databaseType, SchemaInfo[] schemas)
         {
             var arguments = ((int)databaseType).ToString() + " \"" + connectionString.Replace("\"", "\\\"") + "\"";
 
@@ -82,14 +97,21 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
                 arguments += $" \"{string.Join(",", schemas.Select(s => s.Name.Replace("\"", "\\\"")))}\"";
             }
 
-            return GetTablesInternal(arguments);
+            return await GetTablesInternalAsync(arguments);
         }
 
-        private List<TableModel> GetTablesInternal(string arguments)
+        private async Task<List<TableModel>> GetTablesInternalAsync(string arguments)
         {
-            if (!IsDotnetInstalled())
+            string version = "3.1";
+
+            if (codeGenerationMode == CodeGenerationMode.EFCore6)
             {
-                throw new Exception($"Reverse engineer error: Unable to launch 'dotnet' version 3.1. Do you have the runtime installed? Check with 'dotnet --list-runtimes'");
+                version = "5.0";
+            }
+
+            if (await IsDotnetInstalledAsync(version) == false)
+            {
+                throw new Exception($"Reverse engineer error: Unable to launch 'dotnet' version {version}. Do you have the runtime installed? Check with 'dotnet --list-runtimes'");
             }
 
             var launchPath = DropNetCoreFiles();
@@ -100,12 +122,12 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
                 Arguments = arguments,
             };
 
-            var standardOutput = RunProcess(startInfo);
+            var standardOutput = await RunProcessAsync(startInfo);
 
             return resultDeserializer.BuildTableResult(standardOutput);
         }
 
-        private ReverseEngineerResult GetOutput()
+        private async Task<ReverseEngineerResult> GetOutputAsync()
         {
             var path = Path.GetTempFileName() + ".json";
             File.WriteAllText(path, options.Write());
@@ -118,7 +140,7 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
                 Arguments = "\"" + path + "\"",
             };
 
-            var standardOutput = RunProcess(startInfo);
+            var standardOutput = await RunProcessAsync(startInfo);
 
             try
             {
@@ -131,10 +153,20 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
 
         private string GetExeName()
         {
-            return useEFCore5 ? "efreveng50.exe" : "efreveng.exe";
+            switch (codeGenerationMode)
+            {   
+                case CodeGenerationMode.EFCore5:
+                    return "efreveng50.exe";
+                case CodeGenerationMode.EFCore3:
+                    return "efreveng.exe";
+                case CodeGenerationMode.EFCore6:
+                    return "efreveng60.exe";
+                default:
+                    throw new NotSupportedException("Unsupported code generation mode");
+            }
         }
 
-        private bool IsDotnetInstalled()
+        private async Task<bool> IsDotnetInstalledAsync(string version)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -142,7 +174,7 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
                 Arguments = "--list-runtimes",
             };
 
-            var result = RunProcess(startInfo);
+            var result = await RunProcessAsync(startInfo);
 
             if (string.IsNullOrWhiteSpace(result))
             {
@@ -153,7 +185,7 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
             var sdks = result.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var item in sdks)
             {
-                isInstalled = item.StartsWith("Microsoft.NETCore.App 3.1.", StringComparison.OrdinalIgnoreCase);
+                isInstalled = item.StartsWith($"Microsoft.NETCore.App {version}.", StringComparison.OrdinalIgnoreCase);
                 if (isInstalled)
                 {
                     break;
@@ -163,28 +195,47 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
             return isInstalled;
         }
 
-        private static string RunProcess(ProcessStartInfo startInfo)
+        private static async Task<string> RunProcessAsync(ProcessStartInfo startInfo)
         {
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.CreateNoWindow = true;
             startInfo.StandardOutputEncoding = Encoding.UTF8;
-
             var standardOutput = new StringBuilder();
-            using (var process = Process.Start(startInfo))
-            {
-                while (process != null && !process.HasExited)
-                {
-                    standardOutput.Append(process.StandardOutput.ReadToEnd());
-                }
-                if (process != null)
-                {
-                    standardOutput.Append(process.StandardOutput.ReadToEnd());
-                }
-            }
+            var error = string.Empty;
 
-            return standardOutput.ToString();
+            try
+            {
+                using (var process = Process.Start(startInfo))
+                {
+                    while (process != null && !process.HasExited)
+                    {
+                        standardOutput.Append(await process.StandardOutput.ReadToEndAsync());
+                    }
+                    if (process != null)
+                    {
+                        standardOutput.Append(await process.StandardOutput.ReadToEndAsync());
+                    }
+                    if (process != null)
+                    {
+                        error = await process.StandardError.ReadToEndAsync();
+                    }
+                }
+
+                var result = standardOutput.ToString();
+
+                if (string.IsNullOrEmpty(result) && !string.IsNullOrEmpty(error))
+                {
+                    result = "Error:" + Environment.NewLine + error;
+                }
+
+                return result;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private string DropNetCoreFiles()
@@ -210,7 +261,7 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
 
             ZipFile.ExtractToDirectory(Path.Combine(fromDir, "efreveng.exe.zip"), toDir);
 
-            if (useEFCore5)
+            if (codeGenerationMode == CodeGenerationMode.EFCore5)
             {
                 using (var archive = ZipFile.Open(Path.Combine(fromDir, "efreveng50.exe.zip"), ZipArchiveMode.Read))
                 {
@@ -218,7 +269,15 @@ namespace EFCorePowerTools.Handlers.ReverseEngineer
                 }
             }
 
-            var dirs = Directory.GetDirectories(Path.GetTempPath(), useEFCore5 ? "efreveng5*" : "efreveng3*");
+            if (codeGenerationMode == CodeGenerationMode.EFCore6)
+            {
+                using (var archive = ZipFile.Open(Path.Combine(fromDir, "efreveng60.exe.zip"), ZipArchiveMode.Read))
+                {
+                    archive.ExtractToDirectory(toDir, true);
+                }
+            }
+
+            var dirs = Directory.GetDirectories(Path.GetTempPath(), revengRoot + "*");
 
             foreach (var dir in dirs)
             {

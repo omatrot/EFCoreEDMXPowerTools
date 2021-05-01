@@ -24,6 +24,7 @@ using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -373,7 +374,6 @@ namespace EFCorePowerTools
             messenger.Register<ShowMessageBoxMessage>(this, HandleShowMessageBoxMessage);
 
             services.AddSingleton<IExtensionVersionService, ExtensionVersionService>()
-                    .AddSingleton<IInstalledComponentsService, InstalledComponentsService>()
                     .AddSingleton<IMessenger>(messenger);
 
             // Register DAL
@@ -418,7 +418,7 @@ namespace EFCorePowerTools
                     }
                     if (exception != null)
                     {
-                        buildOutputWindow.OutputString(exception + Environment.NewLine);
+                        buildOutputWindow.OutputString(exception.Demystify() + Environment.NewLine);
                     }
 
                     buildOutputWindow.Activate();
