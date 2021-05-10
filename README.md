@@ -2,7 +2,7 @@
 
 A simple CLI tool to generate an EF Core context and entities from an exitsing EDMX file.
 
-This repo has been unforked from https://github.com/ErikEJ/EFCorePowerTools to live on its own, stealing some of the original bits in the process. Thanks @ErikEJ.
+This repo has been unforked and renamed from https://github.com/ErikEJ/EFCorePowerTools to live on its own, stealing some of the original bits in the process. Thanks @ErikEJ.
 
 TODO List:
 
