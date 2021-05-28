@@ -1,3 +1,5 @@
+This project is currently on hold as I've lost my husband.
+
 # EF Core EDMX Power Tools
 
 A simple CLI tool to generate an EF Core context and related entities from an existing EDMX file.
